@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 const SearchResults = ({ apiKey }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+  const [yearFilter, setYearFilter] = useState("");
 
   //   if you want real-time data fetching as the user enters each letter-
   //   useEffect(() => {
@@ -29,6 +30,13 @@ const SearchResults = ({ apiKey }) => {
     }
   };
 
+  const filteredMovies = searchResults.filter(({ release_date }) => {
+    if (yearFilter) {
+      return new Date(release_date).getFullYear() === parseInt(yearFilter, 10);
+    }
+    return true;
+  });
+
   return (
     <>
       <div className="search-container">
@@ -43,10 +51,23 @@ const SearchResults = ({ apiKey }) => {
           search
         </button>
       </div>
+      <div className="filter-container">
+        <select
+          onChange={(event) => {
+            setYearFilter(event.target.value);
+          }}
+        >
+          <option value="">None</option>
+          {[...Array(124)].map((_, index) => (
+            <option value={2023 - index}>{2023 - index}</option>
+          ))}
+        </select>
+        <button onClick={() => setYearFilter("")}>delete filter</button>
+      </div>
       <div className="movie-result-container">
         <ul>
-          {searchResults &&
-            searchResults.map(({ id, title }) => <li key={id}>{title}</li>)}
+          {filteredMovies &&
+            filteredMovies.map(({ id, title }) => <li key={id}>{title}</li>)}
         </ul>
       </div>
     </>
